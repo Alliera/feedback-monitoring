@@ -2,7 +2,7 @@ version: "3.7"
 services:
   mongodb:
     image: mongo:latest
-    container_name: "mongodb_wm"
+    container_name: "mongodb_fm"
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
@@ -13,7 +13,7 @@ services:
     command: mongod --logpath=/dev/null # --quiet
 
   redash_server:
-    container_name: redash_server_wm
+    container_name: redash_server_fm
     image: redash/redash
     depends_on:
       - mongodb
@@ -28,7 +28,7 @@ services:
       REDASH_WEB_WORKERS: 4
 
   redash_worker:
-    container_name: redash_worker_wm
+    container_name: redash_worker_fm
     image: redash/redash:latest
     depends_on:
       - mongodb
@@ -41,7 +41,7 @@ services:
       WORKERS_COUNT: 2
 
   postgres:
-    container_name: postgres_wm
+    container_name: postgres_fm
     image: postgres:9.5-alpine
     #    ports:
     #      - "0901:5432"
@@ -51,12 +51,12 @@ services:
     restart: always
 
   redis:
-    container_name: redis_wm
+    container_name: redis_fm
     image: redis:5.0-alpine
     restart: always
 
   python:
-    container_name: python_wm
+    container_name: python_fm
     build:
       context: .docker/python
     env_file: .docker/env/python
@@ -65,7 +65,7 @@ services:
       - ./:/usr/src/app
 
   mongo-express:
-    container_name: mongo_express_wm
+    container_name: mongo_express_fm
     image: mongo-express
     env_file: .docker/env/redash
     depends_on:
