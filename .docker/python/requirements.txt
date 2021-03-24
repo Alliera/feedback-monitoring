@@ -2,3 +2,4 @@ timeloop
 pymongo
 python-dateutil
 requests
+pyyaml
