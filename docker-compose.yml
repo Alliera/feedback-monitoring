@@ -1,0 +1,74 @@
+version: "3.7"
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb_wm"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - .docker/data/mongodb:/data/db
+#    ports:
+#      - 37017:27017
+    command: mongod --logpath=/dev/null # --quiet
+
+  redash_server:
+    container_name: redash_server_wm
+    image: redash/redash
+    depends_on:
+      - mongodb
+      - redis
+      - postgres
+    env_file: .docker/env/redash
+    restart: always
+    command: server
+    ports:
+      - "9121:5000"
+    environment:
+      REDASH_WEB_WORKERS: 4
+
+  redash_worker:
+    container_name: redash_worker_wm
+    image: redash/redash:latest
+    depends_on:
+      - mongodb
+      - redis
+      - postgres
+    env_file: .docker/env/redash
+    command: scheduler
+    environment:
+      QUEUES: "queries,scheduled_queries,celery"
+      WORKERS_COUNT: 2
+
+  postgres:
+    container_name: postgres_wm
+    image: postgres:9.5-alpine
+    #    ports:
+    #      - "0901:5432"
+    env_file: .docker/env/redash
+    volumes:
+      - .docker/data/redash/postgres-data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    container_name: redis_wm
+    image: redis:5.0-alpine
+    restart: always
+
+  python:
+    container_name: python_wm
+    build:
+      context: .docker/python
+    env_file: .docker/env/python
+    command: python -u scheduler.py
+    volumes:
+      - ./:/usr/src/app
+
+  mongo-express:
+    container_name: mongo_express_wm
+    image: mongo-express
+    env_file: .docker/env/redash
+    depends_on:
+      - mongodb
+    ports:
+      - "12327:8081"
