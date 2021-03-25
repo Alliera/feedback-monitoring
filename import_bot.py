@@ -32,9 +32,10 @@ class ImportBot(SyncInterface):
 
     def __save(self, results):
         for r in results:
-            doc = {}
-            doc['creation'] = datetime.strptime(r['creation'], '%Y-%m-%dT%H:%M:%S.%f') if r['creation'] else None
-            doc['end_time'] = datetime.strptime(r['end_time'], '%Y-%m-%dT%H:%M:%S.%f') if r['end_time'] else None
+            doc = {'creation': datetime.strptime(r['creation'], '%Y-%m-%dT%H:%M:%S.%f') if r['creation'] else None,
+                   'end_time': datetime.strptime(r['end_time'], '%Y-%m-%dT%H:%M:%S.%f') if r['end_time'] else None,
+                   'enterprise_id': self.enterprise_id,
+                   'slug': self.slug}
             fields = ['id', 'state', 'total_row_count', 'processed_row_count', 'failed_row_count']
             for filed in fields:
                 doc[filed] = r[filed]

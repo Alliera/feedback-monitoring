@@ -1,4 +1,5 @@
 /.idea
 /.docker/env/python
 /.docker/env/redash
+/.docker/data
 /enterprises.yaml
