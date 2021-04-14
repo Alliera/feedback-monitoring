@@ -30,10 +30,18 @@ class ImportBot(SyncInterface):
     def get_target_collection(self) -> Collection:
         return self.db.import_stat
 
+    def parse_date(self, date):
+        if not date:
+            return None
+        try:
+            return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
+        except Exception:
+            return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+            
     def __save(self, results):
         for r in results:
-            doc = {'creation': datetime.strptime(r['creation'], '%Y-%m-%dT%H:%M:%S.%f') if r['creation'] else None,
-                   'end_time': datetime.strptime(r['end_time'], '%Y-%m-%dT%H:%M:%S.%f') if r['end_time'] else None,
+            doc = {'creation': self.parse_date(r['creation']),
+                   'end_time': self.parse_date(r['end_time']),
                    'enterprise_id': self.enterprise_id,
                    'slug': self.slug}
             fields = ['id', 'state', 'total_row_count', 'processed_row_count', 'failed_row_count']
