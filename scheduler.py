@@ -4,9 +4,9 @@ from datetime import timedelta
 from sync_interface import SyncInterface
 import export_bot
 import import_bot
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 tl = Timeloop()
 export_stat = export_bot.ExportBot()
