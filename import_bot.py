@@ -34,7 +34,6 @@ class ImportBot(SyncInterface):
                 r = self.request('v2/import/expand-basic/', parts[1]).json()
                 print(r['next'])
                 self.__save(r['results'])
-                self.__save(r['results'])
 
     def get_target_collection(self) -> Collection:
         return self.db.import_stat

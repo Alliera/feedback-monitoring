@@ -19,7 +19,7 @@ class EnterpriseUpdater:
                                        "$set": doc}, upsert=True)
 
     def create_indexes(self):
-        self.db.import_stat.create_index([("creation", -1), ("id", -1)])
+        self.db.import_stat.create_index([("id", -1), ("slug", -1)])
 
 
 u = EnterpriseUpdater()
