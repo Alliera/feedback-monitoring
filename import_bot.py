@@ -18,13 +18,22 @@ class ImportBot(SyncInterface):
             print(f'Start Import statistics sync for `{slug}` enterprise...')
             print('==========================================================')
             self.init(enterprise, slug)
-
-            r = self.request('v2/import/expand-basic/', 'page=1&limit=1000').json()
+            last_date = self.get_db_last_date('creation')
+            
+            if last_date:
+                date_from = self.get_date_from(last_date)
+            else:
+                first_export_date_str = self.request(
+                    'v2/import/expand-basic/', "limit=1&sort=id").json()['results'][0]['creation']
+                date_from = first_export_date_str.split('T')[0]
+            date_to = datetime.now().strftime("%Y-%m-%d")
+            r = self.request('v2/import/expand-basic/', f'page=1&limit=1000&creation_range={date_from + "," + date_to}').json()
             self.__save(r['results'])
             while r['next']:
                 parts = r['next'].split('?')
                 r = self.request('v2/import/expand-basic/', parts[1]).json()
                 print(r['next'])
+                self.__save(r['results'])
                 self.__save(r['results'])
 
     def get_target_collection(self) -> Collection:

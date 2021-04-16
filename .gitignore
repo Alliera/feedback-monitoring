@@ -3,3 +3,5 @@
 /.docker/env/redash
 /.docker/data
 /enterprises.yaml
+/.history
+/__pycache___

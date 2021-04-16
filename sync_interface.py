@@ -11,7 +11,8 @@ from abc import ABC, abstractmethod
 
 class SyncInterface(ABC):
     def __init__(self):
-        self.mongo_client = MongoClient(os.environ['MONGO_HOST'], int(os.environ['MONGO_PORT']))
+        self.mongo_client = MongoClient(
+            os.environ['MONGO_HOST'], int(os.environ['MONGO_PORT']))
         self.db = self.mongo_client.feedback_monitoring
         self.collection = self.get_target_collection()
         self.slug = None
@@ -39,6 +40,9 @@ class SyncInterface(ABC):
     def get_target_collection(self) -> Collection:
         raise
 
+    def get_date_from(self, last_date):
+        return (last_date - timedelta(days=self.days_before)).strftime("%Y-%m-%d")
+
     def retake_jwt(self):
         print('Jwt retry by access code...')
         url = f'https://{self.slug}-rest.sandsiv.com/acquire-jwt/?ac={self.access_code}'
@@ -53,6 +57,14 @@ class SyncInterface(ABC):
             sleep(1)
             return self.request(route, query)
         return r
+
+    def get_db_last_date(self, column):
+        last = self.collection.find_one(
+            {'enterprise_id': self.enterprise_id}, sort=[(column, -1)])
+        if not last:
+            return None
+        else:
+            return last[column]
 
     @staticmethod
     def get_config():

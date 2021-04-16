@@ -16,11 +16,12 @@ class ExportBot(SyncInterface):
             print(f'Start Export statistics sync for `{slug}` enterprise...')
             print('==========================================================')
             self.init(enterprise, slug)
-            last_date = self.get_last_date()
+            last_date = self.get_db_last_date('date')
             if last_date:
-                date_from = (last_date - timedelta(days=self.days_before)).strftime("%Y-%m-%d")
+                date_from = self.get_date_from(last_date)
             else:
-                first_export_date_str = self.request('export/', "limit=1&sort=id").json()['results'][0]['creation']
+                first_export_date_str = self.request(
+                    'export/', "limit=1&sort=id").json()['results'][0]['creation']
                 date_from = first_export_date_str.split('T')[0]
             date_to = datetime.now().strftime("%Y-%m-%d")
             last = None
@@ -28,20 +29,15 @@ class ExportBot(SyncInterface):
                 if last is None:
                     last = date
                     continue
-                print(f'Sync export statistics ({slug}) from {last} to {date}...')
-                r = self.request('statistics/summary/', f'start_time={last}&range_type=creation&end_time={date}')
+                print(
+                    f'Sync export statistics ({slug}) from {last} to {date}...')
+                r = self.request(
+                    'statistics/summary/', f'start_time={last}&range_type=creation&end_time={date}')
                 self.__save(datetime.strptime(last, '%Y-%m-%d'), r.json())
                 last = date
 
     def get_target_collection(self) -> Collection:
         return self.db.export_stat
-
-    def get_last_date(self):
-        last = self.collection.find_one({'enterprise_id': self.enterprise_id}, sort=[('date', -1)])
-        if not last:
-            return None
-        else:
-            return last['date']
 
     def __save(self, date, data):
         for channel, item in data.items():
@@ -53,3 +49,4 @@ class ExportBot(SyncInterface):
                 self.collection.insert_one(item)
             else:
                 self.collection.update_one({"_id": doc["_id"]}, {"$set": item})
+
