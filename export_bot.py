@@ -40,13 +40,8 @@ class ExportBot(SyncInterface):
         return self.db.export_stat
 
     def __save(self, date, data):
-        for channel, item in data.items():
-            item['date'] = date
-            item['enterprise_id'] = self.enterprise_id
-            item['slug'] = self.slug
-            doc = self.collection.find_one({"date": date, "channel": channel})
-            if not doc:
-                self.collection.insert_one(item)
-            else:
-                self.collection.update_one({"_id": doc["_id"]}, {"$set": item})
-
+        for channel, doc in data.items():
+            doc['date'] = date
+            doc['enterprise_id'] = self.enterprise_id
+            doc['slug'] = self.slug
+            self.collection.update_one({"date": date, "channel": channel, "slug": self.slug}, {"$set": doc}, upsert=True)

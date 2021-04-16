@@ -56,4 +56,4 @@ class ImportBot(SyncInterface):
             fields = ['id', 'state', 'total_row_count', 'processed_row_count', 'failed_row_count']
             for filed in fields:
                 doc[filed] = r[filed]
-            self.collection.update_one({"id": doc["id"]}, {"$set": doc}, upsert=True)
+            self.collection.update_one({"id": doc["id"], "slug": self.slug}, {"$set": doc}, upsert=True)
