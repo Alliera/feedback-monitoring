@@ -10,7 +10,7 @@ services:
       - .docker/data/mongodb:/data/db
 #    ports:
 #      - 37017:27017
-    command: mongod --logpath=/dev/null # --quiet
+    command: mongod
 
   redash_server:
     container_name: redash_server_fm
