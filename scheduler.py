@@ -18,7 +18,7 @@ def _export():
     run_command(export_stat)
 
 
-@tl.job(interval=timedelta(seconds=1))
+@tl.job(interval=timedelta(hours=2))
 def _import():
     run_command(import_stat)
 
