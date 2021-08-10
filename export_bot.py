@@ -44,7 +44,7 @@ class ExportBot(SyncInterface):
 
     def __save(self, date, data):
         items = data.items()
-        print(f"Saving {len(items)} items for {date} date for {self.slug}...")
+        print(f"Saving {len(items)} export items for {date} date for {self.slug}...")
         for channel, doc in items:
             doc['date'] = date
             doc['enterprise_id'] = self.enterprise_id
