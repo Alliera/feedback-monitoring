@@ -20,7 +20,7 @@ class SyncInterface(ABC):
         self.host = None
         self.jwt = None
         self.access_code = None
-        self.days_before = 3
+        self.days_before = 14
 
     def init(self, enterprise, slug):
         self.host = f"https://{slug}-rest.sandsiv.com" + '/api/rest/'
