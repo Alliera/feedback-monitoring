@@ -80,6 +80,8 @@ class SyncInterface(ABC):
         result = []
         for single_date in self.daterange(start_date, end_date):
             result.append(single_date.strftime("%Y-%m-%d"))
+        result.append(date_to)
+
         return result
 
     def daterange(self, start_date, end_date):

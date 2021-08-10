@@ -17,14 +17,17 @@ class ExportBot(SyncInterface):
             print('==========================================================')
             self.init(enterprise, slug)
             last_date = self.get_db_last_date('date')
+            print(f'Last Export date {last_date}  for `{slug}` enterprise...')
             if last_date:
                 date_from = self.get_date_from(last_date)
             else:
                 first_export_date_str = self.request(
                     'export/', "limit=1&sort=id").json()['results'][0]['creation']
                 date_from = first_export_date_str.split('T')[0]
+
             date_to = datetime.now().strftime("%Y-%m-%d")
             last = None
+            print(f'Export date from for request: FROM {date_from} TO {date_to} for `{slug}` enterprise...')
             for date in self.get_date_range(date_from, date_to):
                 if last is None:
                     last = date
@@ -40,8 +43,11 @@ class ExportBot(SyncInterface):
         return self.db.export_stat
 
     def __save(self, date, data):
-        for channel, doc in data.items():
+        items = data.items()
+        print(f"Saving {len(items)} items for {date} date for {self.slug}...")
+        for channel, doc in items:
             doc['date'] = date
             doc['enterprise_id'] = self.enterprise_id
             doc['slug'] = self.slug
-            self.collection.update_one({"date": date, "channel": channel, "slug": self.slug}, {"$set": doc}, upsert=True)
+            self.collection.update_one({"date": date, "channel": channel, "slug": self.slug}, {"$set": doc},
+                                       upsert=True)
