@@ -21,6 +21,7 @@ class SyncInterface(ABC):
         self.jwt = None
         self.access_code = None
         self.days_before = 14
+        self.request_timeout = 300
 
     def init(self, enterprise, slug):
         self.host = f"https://{slug}-rest.sandsiv.com" + '/api/rest/'
@@ -46,12 +47,12 @@ class SyncInterface(ABC):
     def retake_jwt(self):
         print('Jwt retry by access code...')
         url = f'https://{self.slug}-rest.sandsiv.com/acquire-jwt/?ac={self.access_code}'
-        r = requests.get(url).json()
+        r = requests.get(url, timeout=self.request_timeout).json()
         self.jwt = r['token']
 
     def request(self, route, query):
         url = f'{self.host}{route}?{query}'
-        r = requests.get(url, headers={'authorization': f'jwt {self.jwt}'})
+        r = requests.get(url, headers={'authorization': f'jwt {self.jwt}'}, timeout=self.request_timeout)
         if r.status_code != 200:
             self.retake_jwt()
             sleep(1)

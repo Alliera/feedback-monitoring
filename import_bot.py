@@ -3,6 +3,7 @@ from datetime import datetime
 from pymongo.collection import Collection
 
 from sync_interface import SyncInterface
+from requests.exceptions import Timeout
 
 
 class ImportBot(SyncInterface):
@@ -19,25 +20,28 @@ class ImportBot(SyncInterface):
             print('==========================================================')
             self.init(enterprise, slug)
             last_date = self.get_db_last_date('creation')
-            print(f'Last Import date {last_date} for `{slug}` enterprise...')
-            if last_date:
-                date_from = self.get_date_from(last_date)
-            else:
-                first_export_date_str = self.request(
-                    'v2/import/expand-basic/', "limit=1&sort=id").json()['results'][0]['creation']
-                date_from = first_export_date_str.split('T')[0]
-            date_to = datetime.now().strftime("%Y-%m-%d")
+            try:
+                print(f'Last Import date {last_date} for `{slug}` enterprise...')
+                if last_date:
+                    date_from = self.get_date_from(last_date)
+                else:
+                    first_export_date_str = self.request(
+                        'v2/import/expand-basic/', "limit=1&sort=id").json()['results'][0]['creation']
+                    date_from = first_export_date_str.split('T')[0]
+                date_to = datetime.now().strftime("%Y-%m-%d")
 
-            print(f'Import start date FROM {date_from} TO {date_to} for `{slug}` enterprise...')
-            print(f'Import First request: page=1&limit=1000&creation_range={date_from + "," + date_to}')
-            r = self.request('v2/import/expand-basic/',
-                             f'page=1&limit=1000&creation_range={date_from + "," + date_to}').json()
-            self.__save(r['results'])
-            while r['next']:
-                parts = r['next'].split('?')
-                r = self.request('v2/import/expand-basic/', parts[1]).json()
-                print(r['next'])
+                print(f'Import start date FROM {date_from} TO {date_to} for `{slug}` enterprise...')
+                print(f'Import First request: page=1&limit=1000&creation_range={date_from + "," + date_to}')
+                r = self.request('v2/import/expand-basic/',
+                                 f'page=1&limit=1000&creation_range={date_from + "," + date_to}').json()
                 self.__save(r['results'])
+                while r['next']:
+                    parts = r['next'].split('?')
+                    r = self.request('v2/import/expand-basic/', parts[1]).json()
+                    print(r['next'])
+                    self.__save(r['results'])
+            except Timeout:
+                print(f'Timeout exceeded for request of `{slug}` enterprise...')
 
     def get_target_collection(self) -> Collection:
         return self.db.import_stat
