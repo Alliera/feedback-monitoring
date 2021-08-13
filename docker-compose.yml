@@ -11,6 +11,10 @@ services:
 #    ports:
 #      - 37017:27017
     command: mongod
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
 
   redash_server:
     container_name: redash_server_fm
@@ -26,6 +30,10 @@ services:
       - "9121:5000"
     environment:
       REDASH_WEB_WORKERS: 4
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
 
   redash_worker:
     container_name: redash_worker_fm
@@ -39,6 +47,10 @@ services:
     environment:
       QUEUES: "queries,scheduled_queries,celery"
       WORKERS_COUNT: 2
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
 
   postgres:
     container_name: postgres_fm
@@ -49,18 +61,29 @@ services:
     volumes:
       - .docker/data/redash/postgres-data:/var/lib/postgresql/data
     restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
 
   redis:
     container_name: redis_fm
     image: redis:5.0-alpine
     restart: always
-
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
   python:
     container_name: python_fm
     build:
       context: .docker/python
     env_file: .docker/env/python
     command: python -u scheduler.py
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
     volumes:
       - ./:/usr/src/app
 
@@ -72,3 +95,7 @@ services:
       - mongodb
     ports:
       - "12327:8081"
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
