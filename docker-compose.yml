@@ -3,6 +3,7 @@ services:
   mongodb:
     image: mongo:latest
     container_name: "mongodb_fm"
+    restart: always
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
@@ -38,6 +39,7 @@ services:
   redash_worker:
     container_name: redash_worker_fm
     image: redash/redash:latest
+    restart: always
     depends_on:
       - mongodb
       - redis
@@ -76,6 +78,7 @@ services:
         max-size: "50m"
   python:
     container_name: python_fm
+    restart: always
     build:
       context: .docker/python
     env_file: .docker/env/python
@@ -90,6 +93,7 @@ services:
   mongo-express:
     container_name: mongo_express_fm
     image: mongo-express
+    restart: always
     env_file: .docker/env/redash
     depends_on:
       - mongodb
