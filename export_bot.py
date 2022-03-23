@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from pymongo.collection import Collection
 from sync_interface import SyncInterface
 
