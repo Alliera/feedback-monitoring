@@ -60,6 +60,7 @@ class MongoElastic:
         for doc in docs:
             doc["_id"] = str(doc["_id"])
             doc["_index"] = self.es_config["index_name"]
+            doc["date"] = doc["date"] if "date" in doc else doc[self.es_config["date_column"]]
             actions.append(doc)
 
         response = helpers.bulk(self.es_client, actions)
