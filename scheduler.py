@@ -46,6 +46,8 @@ def _import():
     obj.start()
     config['mongodb_config']['collection'] = 'import_stat'
     config['es_config']['index_name'] = 'import_stat'
+    config['es_config']['date_column'] = 'creation'
+
     obj = MongoElastic(config)
     obj.start()
 
