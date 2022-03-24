@@ -2,6 +2,7 @@ import os
 import time
 from timeloop import Timeloop
 from datetime import timedelta
+from time import sleep
 
 from mongo_to_elastic import MongoElastic
 from sync_interface import SyncInterface
@@ -50,6 +51,7 @@ def _import():
 
     obj = MongoElastic(config)
     obj.start()
+    sleep(1000)
 
 
 def run_command(bot):
