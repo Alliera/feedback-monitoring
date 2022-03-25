@@ -51,7 +51,7 @@ def _import():
 
     obj = MongoElastic(config)
     obj.start()
-    sleep(1000)
+    sleep(100)
 
 
 def run_command(bot):
