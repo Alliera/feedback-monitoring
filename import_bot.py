@@ -60,6 +60,7 @@ class ImportBot(SyncInterface):
             doc = {'creation': self.parse_date(r['creation']),
                    'end_time': self.parse_date(r['end_time']),
                    'enterprise_id': self.enterprise_id,
+                   'channel': r['survey']['channel'],
                    'slug': self.slug}
             fields = ['id', 'state', 'total_row_count', 'processed_row_count', 'failed_row_count']
             for filed in fields:
