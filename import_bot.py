@@ -49,10 +49,7 @@ class ImportBot(SyncInterface):
     def parse_date(self, date):
         if not date:
             return None
-        try:
-            return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
-        except Exception:
-            return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+        return datetime.fromisoformat(date)
 
     def __save(self, results):
         print(f'Saving import {len(results)} items for `{self.slug}` enterprise...')
