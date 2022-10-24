@@ -45,7 +45,7 @@ class SyncInterface(ABC):
         return (last_date - timedelta(days=self.days_before)).strftime("%Y-%m-%d")
 
     def retake_jwt(self):
-        print('Jwt retry by access code...')
+        print(f'Jwt retry by access code for {self.slug}...')
         url = f'https://{self.slug}-rest.sandsiv.com/acquire-jwt/?ac={self.access_code}'
         r = requests.get(url, timeout=self.request_timeout).json()
         self.jwt = r['token']
