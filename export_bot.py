@@ -21,8 +21,9 @@ class ExportBot(SyncInterface):
             if last_date:
                 date_from = self.get_date_from(last_date)
             else:
-                first_export_date_str = self.request(
-                    'export/', "limit=1&sort=id").json()['results'][0]['creation']
+                json_data = self.request('export/', "limit=1&sort=id").json()
+                print(json_data)
+                first_export_date_str = json_data['results'][0]['creation']
                 date_from = first_export_date_str.split('T')[0]
 
             date_to = datetime.now().strftime("%Y-%m-%d")
