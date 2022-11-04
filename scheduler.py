@@ -1,5 +1,6 @@
 import os
 import time
+import traceback
 from timeloop import Timeloop
 from datetime import timedelta
 from time import sleep
@@ -61,7 +62,7 @@ def run_command(bot):
         try:
             bot.sync()
         except Exception as e:
-            print("ERROR----------> for " + bot.get_name() + ": " + str(e))
+            print("ERROR----------> for " + bot.get_name() + ": " + traceback.format_exc())
         print("Sync " + bot.get_name() + " complete")
         print("Current time : {}".format(time.ctime()))
 
