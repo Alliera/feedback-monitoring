@@ -20,7 +20,7 @@ class SyncInterface(ABC):
         self.host = None
         self.jwt = None
         self.access_code = None
-        self.days_before = 14
+        self.days_before = 3
         self.request_timeout = 300
 
     def init(self, enterprise, slug):
