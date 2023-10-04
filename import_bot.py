@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pymongo.collection import Collection
+from pymongo.collection import Collection, ASCENDING
 
 from sync_interface import SyncInterface
 from requests.exceptions import Timeout
@@ -62,3 +62,8 @@ class ImportBot(SyncInterface):
             for filed in fields:
                 doc[filed] = r[filed]
             self.collection.update_one({"id": doc["id"], "slug": self.slug}, {"$set": doc}, upsert=True)
+
+    def create_indexes(self):
+        print('start create indexes')
+        self.collection.create_index([("creation", ASCENDING), ("slug", ASCENDING)])
+        print('finish create indexes')

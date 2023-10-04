@@ -1,5 +1,5 @@
 from datetime import datetime
-from pymongo.collection import Collection
+from pymongo.collection import Collection, ASCENDING
 from sync_interface import SyncInterface
 
 
@@ -54,3 +54,8 @@ class ExportBot(SyncInterface):
             doc['slug'] = self.slug
             self.collection.update_one({"date": date, "channel": channel, "slug": self.slug}, {"$set": doc},
                                        upsert=True)
+
+    def create_indexes(self):
+        print('start create indexes')
+        self.collection.create_index([("date", ASCENDING), ("slug", ASCENDING), ("channel", ASCENDING)])
+        print('finish create indexes')
