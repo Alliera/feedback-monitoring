@@ -1,5 +1,7 @@
 from datetime import datetime
-from pymongo.collection import Collection, ASCENDING
+from pymongo.collection import Collection
+from pymongo import ASCENDING
+
 from sync_interface import SyncInterface
 
 
