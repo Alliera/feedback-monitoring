@@ -2,7 +2,7 @@ import os
 import time
 import traceback
 from timeloop import Timeloop
-from datetime import timedelta
+from datetime import datetime, timedelta
 from time import sleep
 
 from mongo_to_elastic import MongoElastic
@@ -15,44 +15,55 @@ export_stat = ExportBot()
 import_stat = import_bot.ImportBot()
 
 
-@tl.job(interval=timedelta(seconds=1))
+def is_hour(hour):
+    current_time = datetime.now().time()
+    target_time = datetime.strptime("0" + hour + ":00", "%H:%M").time()
+    delta = timedelta(minutes=1)
+
+    return target_time - delta <= current_time <= target_time + delta
+
+
+@tl.job(interval=timedelta(seconds=10))
 def _export():
-    run_command(export_stat)
+    if is_hour("1"):
+        run_command(export_stat)
 
 
-@tl.job(interval=timedelta(seconds=1))
+@tl.job(interval=timedelta(seconds=10))
 def _import():
-    run_command(import_stat)
+    if is_hour("1"):
+        run_command(import_stat)
 
 
-@tl.job(interval=timedelta(seconds=1))
-def _import():
-    mongo_host = os.environ['MONGO_HOST']
-    mongo_port = os.environ['MONGO_PORT']
-    config = {
-        "mongodb_config": {
-            "uri": f'mongodb://{mongo_host}:{mongo_port}',
-            "database": "feedback_monitoring",
-            "collection": "export_stat"
-        },
-        "es_config": {
-            "hosts": ["https://a4e0da1e5c3e4aeda2551efec6dea894.europe-west3.gcp.cloud.es.io:9243"],
-            "username": "elastic",
-            "password": "zrNEbGgMvWbt8gEoDqUpbWE1",
-            "index_name": "export_stat",
-            "date_column": "date"
-        },
-        'chunk_size': 10000,
-    }
-    obj = MongoElastic(config)
-    obj.start()
-    config['mongodb_config']['collection'] = 'import_stat'
-    config['es_config']['index_name'] = 'import_stat'
-    config['es_config']['date_column'] = 'creation'
+@tl.job(interval=timedelta(seconds=10))
+def _import_elastic():
+    if is_hour("6"):
+        mongo_host = os.environ['MONGO_HOST']
+        mongo_port = os.environ['MONGO_PORT']
+        config = {
+            "mongodb_config": {
+                "uri": f'mongodb://{mongo_host}:{mongo_port}',
+                "database": "feedback_monitoring",
+                "collection": "export_stat"
+            },
+            "es_config": {
+                "hosts": ["https://a4e0da1e5c3e4aeda2551efec6dea894.europe-west3.gcp.cloud.es.io:9243"],
+                "username": "elastic",
+                "password": "zrNEbGgMvWbt8gEoDqUpbWE1",
+                "index_name": "export_stat",
+                "date_column": "date"
+            },
+            'chunk_size': 10000,
+        }
+        obj = MongoElastic(config)
+        obj.start()
+        config['mongodb_config']['collection'] = 'import_stat'
+        config['es_config']['index_name'] = 'import_stat'
+        config['es_config']['date_column'] = 'creation'
 
-    obj = MongoElastic(config)
-    obj.start()
-    sleep(100)
+        obj = MongoElastic(config)
+        obj.start()
+        sleep(100)
 
 
 def run_command(bot):
