@@ -16,8 +16,8 @@ import_stat = import_bot.ImportBot()
 
 
 def is_hour(hour):
-    current_time = datetime.now().time()
-    target_time = datetime.strptime("0" + hour + ":00", "%H:%M").time()
+    current_time = datetime.now()
+    target_time = current_time.replace(hour=int(hour), minute=0, second=0, microsecond=0)
     delta = timedelta(minutes=1)
 
     return target_time - delta <= current_time <= target_time + delta
